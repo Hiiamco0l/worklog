@@ -88,6 +88,38 @@
   </script>
 </body>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
+<!-- Then create the client -->
+<script>
+  const SUPABASE_URL = 'https://yarxlgnyyucvoocwjdyv.supabase.co'
+';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcnhsZ255eXVjdm9vY3dqZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2MzcyMjYsImV4cCI6MjA2MTIxMzIyNn0.a8Ypqnr_LSUihFeSsDRKjCwxspUefR4H-29Ee7qw7LU'
+;
+
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Your form logic goes here ↓
+  const form = document.querySelector("form");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const tag = document.getElementById("tag").value;
+    const update = document.getElementById("update").value;
+
+    const { data, error } = await supabase.from('posts').insert([
+      { name, tag, update }
+    ]);
+
+    if (error) {
+      alert("Error posting: " + error.message);
+    } else {
+      alert("Post submitted!");
+      form.reset();
+    }
+  });
+</script>
 </body>
 </html>
