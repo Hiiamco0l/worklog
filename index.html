@@ -34,7 +34,6 @@
 </head>
 <body>
 
-  <body>
   <h1>💼 WorkLog</h1>
 
   <form id="postForm">
@@ -58,89 +57,55 @@
     <button type="submit">Post</button>
   </form>
 
-  <div id="feed">
-    <!-- Posts will appear here -->
-  </div>
+  <h2>Recent Updates</h2>
+  <div id="postList"></div>
+
+  <!-- Load Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
-    const form = document.getElementById("postForm");
-    const feed = document.getElementById("feed");
+    const SUPABASE_URL = 'https://yarxlgnyyucvoocwjdyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcnhsZ255eXVjdm9vY3dqZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2MzcyMjYsImV4cCI6MjA2MTIxMzIyNn0.a8Ypqnr_LSUihFeSsDRKjCwxspUefR4H-29Ee7qw7LU';
 
-    form.addEventListener("submit", function (e) {
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById("postForm");
+    const postList = document.getElementById("postList");
+
+    // Submit new post
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const name = document.getElementById("name").value;
       const tag = document.getElementById("tag").value;
       const update = document.getElementById("update").value;
-      const date = new Date().toLocaleDateString();
 
-      const post = document.createElement("div");
-      post.className = "post";
-      post.innerHTML = `
-        <div class="meta">${name} · ${date} · <span class="tag">${tag}</span></div>
-        <p>${update}</p>
-      `;
+      const { error } = await supabase.from('posts').insert([
+        { name, tag, update }
+      ]);
 
-      feed.prepend(post);
-
-      form.reset();
+      if (error) {
+        alert("Error posting: " + error.message);
+      } else {
+        alert("Post submitted!");
+        form.reset();
+        loadPosts(); // Refresh list
+      }
     });
-  </script>
-</body>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    // Load and display posts
+    async function loadPosts() {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-<!-- Then create the client -->
-<script>
-  const SUPABASE_URL = 'https://yarxlgnyyucvoocwjdyv.supabase.co'
-';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcnhsZ255eXVjdm9vY3dqZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2MzcyMjYsImV4cCI6MjA2MTIxMzIyNn0.a8Ypqnr_LSUihFeSsDRKjCwxspUefR4H-29Ee7qw7LU'
-;
+      if (error) {
+        console.error("Error fetching posts:", error);
+        return;
+      }
 
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      postList.innerHTML = ''; // Clear current posts
 
-  // Your form logic goes here ↓
-  const form = document.querySelector("form");
-
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value;
-    const tag = document.getElementById("tag").value;
-    const update = document.getElementById("update").value;
-
-    const { data, error } = await supabase.from('posts').insert([
-      { name, tag, update }
-    ]);
-
-    if (error) {
-      alert("Error posting: " + error.message);
-    } else {
-      alert("Post submitted!");
-      form.reset();
-    }
-	<h2>Recent Updates</h2>
-<div id="postList"></div>
-window.addEventListener("DOMContentLoaded", async () => {
-  const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
-
-  if (error) {
-    console.error("Error fetching posts:", error);
-    return;
-  }
-
-  const postList = document.getElementById("postList");
-
-  data.forEach(post => {
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <strong>${post.name}</strong> <em>(${post.tag})</em><br>
-      ${post.update}<hr>
-    `;
-    postList.appendChild(div);
-  });
-});
-  });
-</script>
-</body>
-</html>
+      data.forEach(post => {
+        const div = document.createElement("div
