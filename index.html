@@ -34,22 +34,60 @@
 </head>
 <body>
 
+  <body>
   <h1>💼 WorkLog</h1>
 
-  <div class="post">
-    <div class="meta">Jane Doe · April 26, 2025 · <span class="tag">#design</span></div>
-    <p>Finished wireframes for the new client dashboard. Next up: prototyping!</p>
+  <form id="postForm">
+    <label>
+      Name:
+      <input type="text" id="name" required />
+    </label>
+    <label>
+      Tag:
+      <select id="tag">
+        <option>#dev</option>
+        <option>#design</option>
+        <option>#writing</option>
+        <option>#misc</option>
+      </select>
+    </label>
+    <label>
+      Update:
+      <textarea id="update" required></textarea>
+    </label>
+    <button type="submit">Post</button>
+  </form>
+
+  <div id="feed">
+    <!-- Posts will appear here -->
   </div>
 
-  <div class="post">
-    <div class="meta">Alex Smith · April 25, 2025 · <span class="tag">#writing</span></div>
-    <p>Wrote 3 articles today for the newsletter. Brain = toast. 🧠</p>
-  </div>
+  <script>
+    const form = document.getElementById("postForm");
+    const feed = document.getElementById("feed");
 
-  <div class="post">
-    <div class="meta">You · April 24, 2025 · <span class="tag">#dev</span></div>
-    <p>Started building WorkLog v1. Let's gooo! 🚀</p>
-  </div>
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const tag = document.getElementById("tag").value;
+      const update = document.getElementById("update").value;
+      const date = new Date().toLocaleDateString();
+
+      const post = document.createElement("div");
+      post.className = "post";
+      post.innerHTML = `
+        <div class="meta">${name} · ${date} · <span class="tag">${tag}</span></div>
+        <p>${update}</p>
+      `;
+
+      feed.prepend(post);
+
+      form.reset();
+    });
+  </script>
+</body>
+
 
 </body>
 </html>
