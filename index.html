@@ -78,54 +78,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <script>
-  const SUPABASE_URL = 'https://yarxlgnyyucvoocwjdyv.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcnhsZ255eXVjdm9vY3dqZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2MzcyMjYsImV4cCI6MjA2MTIxMzIyNn0.a8Ypqnr_LSUihFeSsDRKjCwxspUefR4H-29Ee7qw7LU';
-
-  const { createClient } = supabase;
-  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  async function testConnection() {
-    const { data, error } = await supabaseClient.from('posts').select('*').limit(1);
-    if (error) {
-      console.error("Supabase connection error:", error.message);
-    } else {
-      console.log("Supabase connection OK!");
-    }
-  }
-  testConnection();
-
-  const form = document.getElementById("postForm");
-  const feed = document.getElementById("feed");
-
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value;
-    const tag = document.getElementById("tag").value;
-    const update = document.getElementById("update").value;
-
-    const { error } = await supabaseClient.from('posts').insert([
-      { name, tag, update }
-    ]);
-
-    if (error) {
-      alert("Error posting: " + error.message);
-    } else {
-      alert("Post submitted!");
-      form.reset();
-      loadPosts();
-    }
-  });
+  const supabase = supabase.createClient(
+    'https://yarxlgnyyucvoocwjdyv.supabase.co', 
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcnhsZ255eXVjdm9vY3dqZHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2MzcyMjYsImV4cCI6MjA2MTIxMzIyNn0.a8Ypqnr_LSUihFeSsDRKjCwxspUefR4H-29Ee7qw7LU'
+  );
 
   async function loadPosts() {
-    const { data, error } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const feed = document.getElementById("feed");
+    feed.innerHTML = "";
 
     if (error) {
       console.error("Error loading posts:", error.message);
       return;
     }
-
-    feed.innerHTML = "";
 
     data.forEach(post => {
       const div = document.createElement("div");
@@ -137,6 +107,27 @@
       feed.appendChild(div);
     });
   }
+
+  const form = document.getElementById("postForm");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const tag = document.getElementById("tag").value;
+    const update = document.getElementById("update").value;
+
+    const { error } = await supabase.from('posts').insert([
+      { name, tag, update }
+    ]);
+
+    if (error) {
+      alert("Error posting: " + error.message);
+    } else {
+      form.reset();
+      loadPosts();
+    }
+  });
 
   window.addEventListener("DOMContentLoaded", loadPosts);
 </script>
